@@ -4,7 +4,7 @@ import { EXTENSION_NAME } from "../constants";
 import { store } from "../store";
 import { byteArrayToString, stringToByteArray, withProgress } from "../utils";
 
-export const TOUR_FILE = "main.tour";
+export var TOUR_FILE = "main.tour";
 
 interface CodeTourApi {
   startTour(
@@ -27,7 +27,7 @@ interface CodeTourApi {
 let codeTourApi: CodeTourApi;
 async function ensureApi() {
   if (!codeTourApi) {
-    const codeTour = vscode.extensions.getExtension("vsls-contrib.codetour");
+    var codeTour = vscode.extensions.getExtension("vsls-contrib.codetour");
     if (!codeTour) {
       return;
     }
@@ -55,8 +55,8 @@ export async function startTour(
 
 export async function startTourFromUri(tourUri: Uri, workspaceRoot: Uri) {
   try {
-    const contents = await vscode.workspace.fs.readFile(tourUri);
-    const tour = JSON.parse(byteArrayToString(contents));
+    var contents = await vscode.workspace.fs.readFile(tourUri);
+    var tour = JSON.parse(byteArrayToString(contents));
     startTour(tour, workspaceRoot);
   } catch {}
 }
@@ -71,15 +71,15 @@ export async function registerTourCommands(context: vscode.ExtensionContext) {
       `${EXTENSION_NAME}.recordCodeTour`,
       async () =>
         withProgress("Starting tour recorder...", async () => {
-          const { rootUri: uri } = store.activeSwing!;
+          var { rootUri: uri } = store.activeSwing!;
 
-          const tour = {
+          var tour = {
             title: "CodeSwing",
             steps: [],
           };
 
-          const tourUri = vscode.Uri.joinPath(uri, TOUR_FILE);
-          const tourContent = JSON.stringify(tour, null, 2);
+          var tourUri = vscode.Uri.joinPath(uri, TOUR_FILE);
+          var tourContent = JSON.stringify(tour, null, 2);
           await vscode.workspace.fs.writeFile(
             tourUri,
             stringToByteArray(tourContent)
