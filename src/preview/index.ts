@@ -49,10 +49,10 @@ import { storage } from "./tutorials/storage";
 import { SwingWebView } from "./webview";
 import debounce = require("debounce");
 
-const CONFIG_FILE = "config.json";
-const CANVAS_FILE = "canvas.html";
+var CONFIG_FILE = "config.json";
+var CANVAS_FILE = "canvas.html";
 
-export const DEFAULT_MANIFEST = {
+export var DEFAULT_MANIFEST = {
   scripts: [] as string[],
   styles: [] as string[],
 };
@@ -66,17 +66,17 @@ async function getCanvasContent(uri: Uri, files: string[]) {
 }
 
 async function getManifestContent(uri: Uri, files: string[]) {
-  const manifest = await getFileContents(uri, SWING_FILE);
+  var manifest = await getFileContents(uri, SWING_FILE);
   /*
   if (includesReactFiles(files)) {
-    const parsedManifest = JSON.parse(manifest);
+    var parsedManifest = JSON.parse(manifest);
     if (!includesReactScripts(parsedManifest.scripts)) {
       parsedManifest.scripts.push(...REACT_SCRIPTS);
       parsedManifest.scripts = [...new Set(parsedManifest.scripts)];
 
-      const content = JSON.stringify(parsedManifest, null, 2);
+      var content = JSON.stringify(parsedManifest, null, 2);
 
-      const manifestUri = getFileOfType(uri, files, SwingFileType.manifest);
+      var manifestUri = getFileOfType(uri, files, SwingFileType.manifest);
 
       vscode.workspace.fs.writeFile(manifestUri!, stringToByteArray(content));
       return content;
@@ -91,7 +91,7 @@ function localeCompare(a: string, b: string) {
 }
 
 function isSwingDocument(uri: vscode.Uri) {
-  const swingUri = store.activeSwing!.currentUri;
+  var swingUri = store.activeSwing!.currentUri;
   if (
     !localeCompare(swingUri.scheme, uri.scheme) ||
     !localeCompare(swingUri.authority, uri.authority) ||
@@ -200,7 +200,7 @@ export function getFileOfType(
     );
   }
 
-  const file = files.find((file) =>
+  var file = files.find((file) =>
     fileCandidates!.find((candidate) => candidate === file)
   );
 
@@ -209,14 +209,14 @@ export function getFileOfType(
   }
 }
 
-const TUTORIAL_STEP_PATTERN = /^#?(?<step>\d+)[^\/]*/;
+var TUTORIAL_STEP_PATTERN = /^#?(?<step>\d+)[^\/]*/;
 export async function openSwing(uri: Uri) {
   let currentUri = uri;
   if (store.activeSwing) {
     store.activeSwing.webViewPanel.dispose();
   }
 
-  const isWorkspaceSwing =
+  var isWorkspaceSwing =
     vscode.workspace.workspaceFolders &&
     uri.toString() === vscode.workspace.workspaceFolders[0].uri.toString();
 
@@ -229,12 +229,12 @@ export async function openSwing(uri: Uri) {
   let files = (await vscode.workspace.fs.readDirectory(uri)).map(
     ([file, _]) => file
   );
-  const rootFiles = files;
+  var rootFiles = files;
 
   let manifest: SwingManifest = {};
   if (getFileOfType(uri, files, SwingFileType.manifest)) {
     try {
-      const manifestContent = await getManifestContent(uri, files);
+      var manifestContent = await getManifestContent(uri, files);
       manifest = JSON.parse(manifestContent);
     } catch {}
   }
@@ -244,12 +244,12 @@ export async function openSwing(uri: Uri) {
 
   if (manifest.tutorial) {
     currentTutorialStep = storage.currentTutorialStep(uri);
-    const tutoralSteps = files.filter((file) =>
+    var tutoralSteps = files.filter((file) =>
       file.match(TUTORIAL_STEP_PATTERN)
     );
 
     totalTutorialSteps = tutoralSteps.reduce((maxStep, fileName) => {
-      const step = Number(TUTORIAL_STEP_PATTERN.exec(fileName)!.groups!.step);
+      var step = Number(TUTORIAL_STEP_PATTERN.exec(fileName)!.groups!.step);
 
       if (step > maxStep) {
         return step;
@@ -258,7 +258,7 @@ export async function openSwing(uri: Uri) {
       }
     }, 0);
 
-    const stepDirectory = files.find((file) =>
+    var stepDirectory = files.find((file) =>
       file.match(new RegExp(`^#?${currentTutorialStep}`))
     );
 
@@ -267,14 +267,14 @@ export async function openSwing(uri: Uri) {
       ([file, _]) => file
     );
 
-    const stepManifestFile = getFileOfType(
+    var stepManifestFile = getFileOfType(
       currentUri,
       files,
       SwingFileType.manifest
     );
 
     if (stepManifestFile) {
-      const stepManifest = byteArrayToString(
+      var stepManifest = byteArrayToString(
         await vscode.workspace.fs.readFile(stepManifestFile)
       );
       manifest = {
@@ -284,41 +284,41 @@ export async function openSwing(uri: Uri) {
     }
   }
 
-  const markupFile = getFileOfType(currentUri, files, SwingFileType.markup);
-  const stylesheetFile = getFileOfType(
+  var markupFile = getFileOfType(currentUri, files, SwingFileType.markup);
+  var stylesheetFile = getFileOfType(
     currentUri,
     files,
     SwingFileType.stylesheet
   );
 
-  const scriptFile = getFileOfType(currentUri, files, SwingFileType.script);
-  const readmeFile = getFileOfType(currentUri, files, SwingFileType.readme);
-  const configFile = getFileOfType(currentUri, files, SwingFileType.config);
+  var scriptFile = getFileOfType(currentUri, files, SwingFileType.script);
+  var readmeFile = getFileOfType(currentUri, files, SwingFileType.readme);
+  var configFile = getFileOfType(currentUri, files, SwingFileType.config);
 
-  const inputFile =
+  var inputFile =
     manifest.input && manifest.input.fileName
       ? `${INPUT_SCHEME}:///${manifest.input.fileName}`
       : "";
 
-  const includedFiles = [
+  var includedFiles = [
     !!markupFile,
     !!stylesheetFile,
     !!scriptFile,
     !!inputFile,
   ].filter((file) => file).length;
 
-  const layoutManager = await createLayoutManager(
+  var layoutManager = await createLayoutManager(
     includedFiles,
     manifest.layout
   );
 
-  const [htmlDocument, cssDocument, jsDocument] = await Promise.all(
+  var [htmlDocument, cssDocument, jsDocument] = await Promise.all(
     [markupFile, stylesheetFile, scriptFile].map(
       async (file) => file && vscode.workspace.openTextDocument(file)
     )
   );
 
-  const editors = await Promise.all(
+  var editors = await Promise.all(
     [htmlDocument, cssDocument, jsDocument].map(
       (document) => document && layoutManager.showDocument(document)
     )
@@ -336,11 +336,11 @@ export async function openSwing(uri: Uri) {
       vscode.Uri.parse(inputFile)
     );
 
-    const editor = await layoutManager.showDocument(inputDocument, false);
+    var editor = await layoutManager.showDocument(inputDocument, false);
 
-    const prompt = manifest.input!.prompt;
+    var prompt = manifest.input!.prompt;
     if (prompt) {
-      const decoration = vscode.window.createTextEditorDecorationType({
+      var decoration = vscode.window.createTextEditorDecorationType({
         after: {
           contentText: prompt,
           margin: "0 0 0 30px",
@@ -355,7 +355,7 @@ export async function openSwing(uri: Uri) {
 
     // Continuously save this file so that it doesn't ask
     // the user to save it upon closing
-    const interval = setInterval(() => {
+    var interval = setInterval(() => {
       if (inputDocument) {
         inputDocument.save();
       } else {
@@ -364,7 +364,7 @@ export async function openSwing(uri: Uri) {
     }, 100);
   }
 
-  const webViewPanel = vscode.window.createWebviewPanel(
+  var webViewPanel = vscode.window.createWebviewPanel(
     `${EXTENSION_NAME}.preview`,
     "CodeSwing",
     { viewColumn: layoutManager.previewViewColumn, preserveFocus: true },
@@ -379,7 +379,7 @@ export async function openSwing(uri: Uri) {
     }
   );
 
-  const output = vscode.window.createOutputChannel("CodeSwing");
+  var output = vscode.window.createOutputChannel("CodeSwing");
 
   // In order to provide CodePen interop,
   // we'll look for an optional "scripts"
@@ -394,7 +394,7 @@ export async function openSwing(uri: Uri) {
     styles = await getFileContents(currentUri, "styles");
   }
 
-  const htmlView = new SwingWebView(
+  var htmlView = new SwingWebView(
     webViewPanel.webview,
     output,
     currentUri,
@@ -419,8 +419,8 @@ export async function openSwing(uri: Uri) {
       editors[2] || (includesReactFiles(files) ? editors[0] : undefined),
   };
 
-  const autoRun = config.get("autoRun");
-  const runOnEdit = autoRun === "onEdit";
+  var autoRun = config.get("autoRun");
+  var runOnEdit = autoRun === "onEdit";
 
   function processReadme(rawContent: string, runOnEdit: boolean = false) {
     // @ts-ignore
@@ -434,7 +434,7 @@ export async function openSwing(uri: Uri) {
         EXTENSION_NAME
       );
 
-      const thread = store.activeSwing!.commentController.createCommentThread(
+      var thread = store.activeSwing!.commentController.createCommentThread(
         inputDocument.uri,
         new vscode.Range(0, 0, 0, 0),
         [
@@ -455,16 +455,16 @@ export async function openSwing(uri: Uri) {
       thread.canReply = false;
       thread.collapsibleState = vscode.CommentThreadCollapsibleState.Expanded;
     } else {
-      const htmlContent = getReadmeContent(rawContent);
+      var htmlContent = getReadmeContent(rawContent);
       htmlView.updateReadme(htmlContent || "", runOnEdit);
     }
   }
 
-  const documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(
+  var documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(
     debounce(async ({ document }) => {
       if (store.history && store.history.length > 0) {
-        const version = store.history[store.history.length - 1];
-        const file = version.files.find(
+        var version = store.history[store.history.length - 1];
+        var file = version.files.find(
           (file) => file.filename === path.basename(document.fileName)
         );
         if (file) {
@@ -473,7 +473,7 @@ export async function openSwing(uri: Uri) {
       }
 
       if (isSwingDocumentOfType(document, SwingFileType.markup)) {
-        const content = await getMarkupContent(document);
+        var content = await getMarkupContent(document);
         if (content !== null) {
           htmlView.updateHTML(content, runOnEdit);
         }
@@ -486,7 +486,7 @@ export async function openSwing(uri: Uri) {
           jsDocument.uri.toString() !== document.uri.toString()
         ) {
           // TODO: Clean up this logic
-          const fileName = path.basename(document.uri.toString());
+          var fileName = path.basename(document.uri.toString());
           files.push(fileName);
           files = files.filter(
             (file) => file !== path.basename(jsDocument.uri.toString())
@@ -510,12 +510,12 @@ export async function openSwing(uri: Uri) {
           htmlView.updateJavaScript(jsDocument, runOnEdit);
         }
       } else if (isSwingDocumentOfType(document, SwingFileType.stylesheet)) {
-        const content = await getStylesheetContent(document);
+        var content = await getStylesheetContent(document);
         if (content !== null) {
           htmlView.updateCSS(content, runOnEdit);
         }
       } else if (isSwingDocumentOfType(document, SwingFileType.readme)) {
-        const rawContent = document.getText();
+        var rawContent = document.getText();
         processReadme(rawContent, runOnEdit);
       } else if (isSwingDocumentOfType(document, SwingFileType.config)) {
         htmlView.updateConfig(document.getText(), runOnEdit);
@@ -554,7 +554,7 @@ export async function openSwing(uri: Uri) {
   }
 
   if (readmeFile) {
-    const rawContent = byteArrayToString(
+    var rawContent = byteArrayToString(
       await vscode.workspace.fs.readFile(readmeFile)
     );
 
@@ -562,7 +562,7 @@ export async function openSwing(uri: Uri) {
   }
 
   if (configFile) {
-    const content = byteArrayToString(
+    var content = byteArrayToString(
       await vscode.workspace.fs.readFile(configFile)
     );
 
@@ -577,12 +577,12 @@ export async function openSwing(uri: Uri) {
     true
   );
 
-  const autoSave = vscode.workspace
+  var autoSave = vscode.workspace
     .getConfiguration("files")
     .get<string>("autoSave");
   let autoSaveInterval: any;
 
-  const canEdit = true;
+  var canEdit = true;
   if (
     autoSave !== "afterDelay" && // Don't enable autoSave if the end-user has already configured it
     config.get("autoSave") &&
@@ -621,7 +621,7 @@ export async function openSwing(uri: Uri) {
   });
 
   if (await isCodeTourInstalled()) {
-    const tourUri = getFileOfType(currentUri, files, SwingFileType.tour);
+    var tourUri = getFileOfType(currentUri, files, SwingFileType.tour);
     if (tourUri) {
       store.activeSwing!.hasTour = true;
       startTourFromUri(tourUri, currentUri);
