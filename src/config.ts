@@ -18,11 +18,11 @@ export function get(key: "themePreview"): boolean;
 export function get(key: "ai.endpointUrl"): string;
 export function get(key: "ai.model"): string;
 export function get(key: any) {
-  const extensionConfig = workspace.getConfiguration(EXTENSION_NAME);
+  let extensionConfig = workspace.getConfiguration(EXTENSION_NAME);
   return extensionConfig.get(key);
 }
 
 export async function set(key: string, value: any) {
-  const extensionConfig = workspace.getConfiguration(EXTENSION_NAME);
+  let extensionConfig = workspace.getConfiguration(EXTENSION_NAME);
   return extensionConfig.update(key, value, true);
 }
