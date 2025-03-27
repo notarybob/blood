@@ -1,4 +1,4 @@
 declare module "raw-loader!*" {
-	const value: string;
+	let value: string;
 	export default value;
 }
