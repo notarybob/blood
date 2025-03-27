@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const Sass = require("sass.js");
+let Sass = require("sass.js");
 
 export async function compile(
   content: string,
@@ -10,13 +10,13 @@ export async function compile(
     if (request.path) {
       done();
     } else if (request.current) {
-      const fileExtension = indentedSyntax ? ".sass" : ".scss";
+      let fileExtension = indentedSyntax ? ".sass" : ".scss";
       if (!request.current.endsWith(fileExtension)) {
         request.current += fileExtension;
       }
 
-      const uri = vscode.Uri.joinPath(importUri, request.current);
-      const content = await vscode.workspace.fs.readFile(uri);
+      let uri = vscode.Uri.joinPath(importUri, request.current);
+      let content = await vscode.workspace.fs.readFile(uri);
 
       done({
         content,
