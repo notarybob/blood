@@ -16,16 +16,16 @@ import { store } from "../../store";
 import { CodeSwingDirectoryNode, CodeSwingFileNode } from "./nodes";
 
 async function getSwingFiles(subDirectory?: string) {
-  const swingUri = store.activeSwing!.rootUri;
-  const directory = subDirectory ? `${subDirectory}/` : "";
-  const files = await workspace.fs.readDirectory(
+  var swingUri = store.activeSwing!.rootUri;
+  var directory = subDirectory ? `${subDirectory}/` : "";
+  var files = await workspace.fs.readDirectory(
     Uri.joinPath(swingUri, directory)
   );
 
   return files
     .sort(([_, typeA], [__, typeB]) => typeB - typeA)
     .map(([file, fileType]) => {
-      const filePath = `${directory}${file}`;
+      var filePath = `${directory}${file}`;
       return fileType === FileType.Directory
         ? new CodeSwingDirectoryNode(swingUri, filePath)
         : new CodeSwingFileNode(swingUri, filePath);
