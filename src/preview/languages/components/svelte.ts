@@ -2,19 +2,19 @@ import * as svelte from "svelte/compiler";
 import { getModuleUrl } from "../../../preview/libraries/skypack";
 import { byteArrayToString } from "../../../utils";
 
-let COMPONENT_NAME = `CodeSwingComponent`;
-let INIT_CODE = `new ${COMPONENT_NAME}({ target: document.getElementById("app") });`
-let SVELTE_PATH = getModuleUrl("svelte");
+const COMPONENT_NAME = `CodeSwingComponent`;
+const INIT_CODE = `new ${COMPONENT_NAME}({ target: document.getElementById("app") });`
+const SVELTE_PATH = getModuleUrl("svelte");
 
 export async function compileComponent(content: string) {
-    let { code } = await svelte.preprocess(content, {
+    const { code } = await svelte.preprocess(content, {
         script: async ({ content, attributes }) => {
             if (attributes.lang !== "ts") {
                 return { code: content };
             };
             
-            let typescript = require("typescript");
-            let compiledContent: string = typescript.transpile(content, { target: "ES2018" })
+            const typescript = require("typescript");
+            const compiledContent: string = typescript.transpile(content, { target: "ES2018" })
 
             return {
                 code: compiledContent
@@ -25,8 +25,8 @@ export async function compileComponent(content: string) {
                 return { code: content };
             };
 
-            let sass = require("sass");
-            let compiledContent = byteArrayToString(
+            const sass = require("sass");
+            const compiledContent = byteArrayToString(
                 sass.renderSync({
                   data: content,
                   indentedSyntax: attributes.lang === "sass",
@@ -39,7 +39,7 @@ export async function compileComponent(content: string) {
         }
     });
     
-    let { js } = svelte.compile(code, {
+    const { js } = svelte.compile(code, {
         name: COMPONENT_NAME,
         sveltePath: SVELTE_PATH
     });
